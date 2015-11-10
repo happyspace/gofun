@@ -4,7 +4,8 @@ import (
 	"fmt"
 	"strings"
 	"golang.org/x/tour/pic"
-//	"math"
+	"golang.org/x/tour/wc"
+	"math"
 )
 
 func pointer() {
@@ -166,10 +167,99 @@ type VertexLL struct {
 	Lat, Long float64
 }
 
-func geography(string, VertexLL) map[string]VertexLL {
-	m = make(map[string]VertexLL)
-	m["Bell Labs"] = VertexLL
+var m = map[string]VertexLL{
+	"Bell Labs": {
+		40.68433, -74.39967,
+	},
+	"Google": {
+		37.42202, -122.08408,
+	},
+}
+
+func geography(key string, vLL VertexLL) map[string]VertexLL {
+	if m == nil {
+		m = make(map[string]VertexLL)
+	}
+	m[key] = vLL
 	return m
+}
+
+func mutateMap() {
+	m := make(map[string]int)
+	
+	m["Answer"] = 42
+	fmt.Println("The value:", m["Answer"])
+	
+	m["Answer"] = 48
+	fmt.Println("The value:", m["Answer"])
+
+	delete(m, "Answer")
+	fmt.Println("The value:", m["Answer"])
+	
+	v, ok := m["Answer"]
+	fmt.Println("The value:", v, "Present?", ok)
+}
+
+func WordCount(s string) map[string]int {
+	m := make(map[string]int)
+	words := strings.Fields(s)
+	for i := range words {
+		word := words[i]
+		elem, ok := m[word]
+		if ok {
+			m[word] = elem + 1
+		} else {
+			m[word] = 1
+		}
+	}
+	
+	return m
+}
+
+func compute(fn func(float64, float64) float64) float64 {
+	return fn(3, 4)
+}
+
+var hypot = func(x, y float64) float64 {
+	return math.Sqrt(x*x + y*y)
+}
+
+func adder() func(int) int {
+	sum := 0
+	return func(x int) int {
+		sum += x
+		return sum
+	}
+}
+
+func exAdder() {
+	pos, neg := adder(), adder()
+	for i := 0; i < 10; i++ {
+		fmt.Println(
+			pos(i),
+			neg(-2*i),
+		)
+	}
+}
+
+
+func fibonacci() func() int {
+	fib := -1
+	ona := -1
+	return func() int {
+		if fib < 0 {
+			fib = 0
+			return fib
+		} else if ona < 0 {
+			ona = 1
+			return ona	
+		} else {
+			acci := fib + ona
+			fib = ona
+			ona = acci
+			return acci
+		}
+	}
 }
 
 func main() {
@@ -194,5 +284,30 @@ func main() {
 	ranges()
 	
 	pic.Show(Pic)
+	
+	var vLL = VertexLL{40.68433, -74.39967,}
+	geography("Bell Labs", vLL)
+	fmt.Println(m["Bell Labs"])
+	vLL = VertexLL{37.4828, 122.2361,}
+	geography("Redwood City", vLL)
+	fmt.Println(m["Redwood City"])
+	
+	fmt.Println(m)
+	
+	mutateMap()
+	wc.Test(WordCount)
+	
+	fmt.Println(hypot(5, 12))
+	
+	fmt.Println(compute(hypot))
+	fmt.Println(compute(math.Pow))
+	
+	exAdder()
+	
+	f := fibonacci()
+	for i := 0; i < 10; i++ {
+		fmt.Println(f())
+	}
+	
 }
 
